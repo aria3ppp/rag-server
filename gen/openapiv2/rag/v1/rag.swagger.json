@@ -136,7 +136,7 @@
         "content": {
           "type": "string"
         },
-        "createdAt": {
+        "created_at": {
           "type": "string",
           "format": "date-time"
         },

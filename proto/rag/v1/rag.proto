@@ -22,7 +22,7 @@ message RAGServiceQueryAsyncRequest {
 message RAGServiceQueryAsyncResponseItem {
     bool done = 1;
     string content = 2;
-    google.protobuf.Timestamp created_at = 3;
+    google.protobuf.Timestamp created_at = 3 [json_name="created_at"];
     string error = 4;
 }
 
