@@ -37,9 +37,9 @@ func (grpcService *ragGRPCService) QuerySync(ctx context.Context, request *ragv1
 	return response, nil
 }
 
-func (grpcService *ragGRPCService) QueryAsync(request *ragv1.RAGServiceQueryAsyncRequest, stream grpc.ServerStreamingServer[ragv1.RAGServiceQueryAsyncResponseItem]) error {
+func (grpcService *ragGRPCService) QueryAsync(request *ragv1.RAGServiceQueryAsyncRequest, stream grpc.ServerStreamingServer[ragv1.RAGServiceQueryAsyncResponse]) error {
 	if err := grpcService.uc.QueryAsync(stream.Context(), request.Query, func(ctx context.Context, event *domain.QueryAsyncEvent) error {
-		item := &ragv1.RAGServiceQueryAsyncResponseItem{
+		item := &ragv1.RAGServiceQueryAsyncResponse{
 			Done:      event.Done,
 			Content:   event.Content,
 			CreatedAt: timestamppb.New(event.CreatedAt),

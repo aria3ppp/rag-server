@@ -28,7 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RAGServiceClient interface {
 	QuerySync(ctx context.Context, in *RAGServiceQuerySyncRequest, opts ...grpc.CallOption) (*RAGServiceQuerySyncResponse, error)
-	QueryAsync(ctx context.Context, in *RAGServiceQueryAsyncRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[RAGServiceQueryAsyncResponseItem], error)
+	QueryAsync(ctx context.Context, in *RAGServiceQueryAsyncRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[RAGServiceQueryAsyncResponse], error)
 }
 
 type rAGServiceClient struct {
@@ -49,13 +49,13 @@ func (c *rAGServiceClient) QuerySync(ctx context.Context, in *RAGServiceQuerySyn
 	return out, nil
 }
 
-func (c *rAGServiceClient) QueryAsync(ctx context.Context, in *RAGServiceQueryAsyncRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[RAGServiceQueryAsyncResponseItem], error) {
+func (c *rAGServiceClient) QueryAsync(ctx context.Context, in *RAGServiceQueryAsyncRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[RAGServiceQueryAsyncResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &RAGService_ServiceDesc.Streams[0], RAGService_QueryAsync_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[RAGServiceQueryAsyncRequest, RAGServiceQueryAsyncResponseItem]{ClientStream: stream}
+	x := &grpc.GenericClientStream[RAGServiceQueryAsyncRequest, RAGServiceQueryAsyncResponse]{ClientStream: stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -66,14 +66,14 @@ func (c *rAGServiceClient) QueryAsync(ctx context.Context, in *RAGServiceQueryAs
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type RAGService_QueryAsyncClient = grpc.ServerStreamingClient[RAGServiceQueryAsyncResponseItem]
+type RAGService_QueryAsyncClient = grpc.ServerStreamingClient[RAGServiceQueryAsyncResponse]
 
 // RAGServiceServer is the server API for RAGService service.
 // All implementations must embed UnimplementedRAGServiceServer
 // for forward compatibility.
 type RAGServiceServer interface {
 	QuerySync(context.Context, *RAGServiceQuerySyncRequest) (*RAGServiceQuerySyncResponse, error)
-	QueryAsync(*RAGServiceQueryAsyncRequest, grpc.ServerStreamingServer[RAGServiceQueryAsyncResponseItem]) error
+	QueryAsync(*RAGServiceQueryAsyncRequest, grpc.ServerStreamingServer[RAGServiceQueryAsyncResponse]) error
 	mustEmbedUnimplementedRAGServiceServer()
 }
 
@@ -87,7 +87,7 @@ type UnimplementedRAGServiceServer struct{}
 func (UnimplementedRAGServiceServer) QuerySync(context.Context, *RAGServiceQuerySyncRequest) (*RAGServiceQuerySyncResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method QuerySync not implemented")
 }
-func (UnimplementedRAGServiceServer) QueryAsync(*RAGServiceQueryAsyncRequest, grpc.ServerStreamingServer[RAGServiceQueryAsyncResponseItem]) error {
+func (UnimplementedRAGServiceServer) QueryAsync(*RAGServiceQueryAsyncRequest, grpc.ServerStreamingServer[RAGServiceQueryAsyncResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method QueryAsync not implemented")
 }
 func (UnimplementedRAGServiceServer) mustEmbedUnimplementedRAGServiceServer() {}
@@ -134,11 +134,11 @@ func _RAGService_QueryAsync_Handler(srv interface{}, stream grpc.ServerStream) e
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(RAGServiceServer).QueryAsync(m, &grpc.GenericServerStream[RAGServiceQueryAsyncRequest, RAGServiceQueryAsyncResponseItem]{ServerStream: stream})
+	return srv.(RAGServiceServer).QueryAsync(m, &grpc.GenericServerStream[RAGServiceQueryAsyncRequest, RAGServiceQueryAsyncResponse]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type RAGService_QueryAsyncServer = grpc.ServerStreamingServer[RAGServiceQueryAsyncResponseItem]
+type RAGService_QueryAsyncServer = grpc.ServerStreamingServer[RAGServiceQueryAsyncResponse]
 
 // RAGService_ServiceDesc is the grpc.ServiceDesc for RAGService service.
 // It's only intended for direct use with grpc.RegisterService,

@@ -19,7 +19,7 @@ message RAGServiceQueryAsyncRequest {
     string query = 1;
 }
 
-message RAGServiceQueryAsyncResponseItem {
+message RAGServiceQueryAsyncResponse {
     bool done = 1;
     string content = 2;
     google.protobuf.Timestamp created_at = 3 [json_name="created_at"];
@@ -34,7 +34,7 @@ service RAGService {
         };
     }
 
-    rpc QueryAsync (RAGServiceQueryAsyncRequest) returns (stream RAGServiceQueryAsyncResponseItem) {
+    rpc QueryAsync (RAGServiceQueryAsyncRequest) returns (stream RAGServiceQueryAsyncResponse) {
         option (google.api.http) = {
             post: "/api/v1/rag:queryAsync"
             body: "*"

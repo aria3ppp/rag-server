@@ -26,13 +26,13 @@
               "type": "object",
               "properties": {
                 "result": {
-                  "$ref": "#/definitions/v1RAGServiceQueryAsyncResponseItem"
+                  "$ref": "#/definitions/v1RAGServiceQueryAsyncResponse"
                 },
                 "error": {
                   "$ref": "#/definitions/rpcStatus"
                 }
               },
-              "title": "Stream result of v1RAGServiceQueryAsyncResponseItem"
+              "title": "Stream result of v1RAGServiceQueryAsyncResponse"
             }
           },
           "default": {
@@ -127,7 +127,7 @@
         }
       }
     },
-    "v1RAGServiceQueryAsyncResponseItem": {
+    "v1RAGServiceQueryAsyncResponse": {
       "type": "object",
       "properties": {
         "done": {

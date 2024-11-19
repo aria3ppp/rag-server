@@ -1,7 +1,25 @@
 {
     "cSpell.words": [
+        "baai",
+        "caarlos",
         "embedder",
+        "FASTAPI",
         "Fastembed",
-        "qdrant"
+        "healthcheck",
+        "healthz",
+        "infras",
+        "intfloat",
+        "langchaingo",
+        "llms",
+        "ollama",
+        "openapiv",
+        "protojson",
+        "qdrant",
+        "ragv",
+        "samber",
+        "structpb",
+        "usecase",
+        "VECTORSTORE",
+        "vectorstorev"
     ]
 }
