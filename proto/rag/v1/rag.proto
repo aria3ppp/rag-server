@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package rag.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/aria3ppp/rag-server/gen/go/rag/v1;ragv1";
+
+message RAGServiceQuerySyncRequest {
+    string query = 1;
+}
+
+message RAGServiceQuerySyncResponse {
+    string content = 1;
+}
+
+message RAGServiceQueryAsyncRequest {
+    string query = 1;
+}
+
+message RAGServiceQueryAsyncResponseItem {
+    bool done = 1;
+    string content = 2;
+    google.protobuf.Timestamp created_at = 3;
+    string error = 4;
+}
+
+service RAGService {
+    rpc QuerySync (RAGServiceQuerySyncRequest) returns (RAGServiceQuerySyncResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/rag:querySync"
+            body: "*"
+        };
+    }
+
+    rpc QueryAsync (RAGServiceQueryAsyncRequest) returns (stream RAGServiceQueryAsyncResponseItem) {
+        option (google.api.http) = {
+            post: "/api/v1/rag:queryAsync"
+            body: "*"
+        };
+    }
+}

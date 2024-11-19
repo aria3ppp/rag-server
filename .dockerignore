@@ -1,0 +1,15 @@
+/.vscode/
+
+/docker/
+
+/proto/
+
+/.gitignore
+
+/buf.gen.yaml
+/buf.lock
+/buf.yaml
+
+compose-vectorstore.yaml
+
+README.md
