@@ -32,7 +32,7 @@ message VectorStoreServiceSearchTextResponseSimilarText {
 }
 
 message VectorStoreServiceSearchTextResponse {
-    repeated VectorStoreServiceSearchTextResponseSimilarText similar_texts = 1;
+    repeated VectorStoreServiceSearchTextResponseSimilarText similar_texts = 1 [json_name="similar_texts"];
 }
 
 service VectorStoreService {

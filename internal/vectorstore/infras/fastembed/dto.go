@@ -9,6 +9,6 @@ type fastembedEmbedResponseDTO struct {
 	EmbeddingSize int         `json:"embedding_size"`
 }
 
-type fastembedHealthCheckResponseDTO struct {
-	Status string `json:"status"`
-}
+// type fastembedHealthCheckResponseDTO struct {
+// 	Status string `json:"status"`
+// }

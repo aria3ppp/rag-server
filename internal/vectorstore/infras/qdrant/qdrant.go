@@ -3,25 +3,30 @@ package qdrant
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"reflect"
 
+	"github.com/aria3ppp/rag-server/internal/vectorstore/config"
 	"github.com/aria3ppp/rag-server/internal/vectorstore/domain"
 	"github.com/aria3ppp/rag-server/internal/vectorstore/usecase"
 
 	"github.com/qdrant/go-client/qdrant"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type qdrantRepo struct {
-	client         *qdrant.Client
-	collectionName string
+	client *qdrant.Client
+	config *config.QdrantConfig
+	logger *slog.Logger
 }
 
 var _ usecase.VectorRepo = (*qdrantRepo)(nil)
 
-func NewVectorRepo(ctx context.Context, host string, port int, collection string) (*qdrantRepo, error) {
+func NewVectorRepo(ctx context.Context, config *config.Config, logger *slog.Logger) (*qdrantRepo, error) {
 	client, err := qdrant.NewClient(&qdrant.Config{
-		Host: host,
-		Port: port,
+		Host: config.QdrantConfig.Host,
+		Port: int(config.QdrantConfig.GRPCPort),
 	})
 	if err != nil {
 		return nil, err
@@ -32,7 +37,25 @@ func NewVectorRepo(ctx context.Context, host string, port int, collection string
 		return nil, err
 	}
 
-	return &qdrantRepo{client: client, collectionName: collection}, nil
+	if _, err := client.GetCollectionInfo(ctx, config.QdrantConfig.CollectionName); err != nil {
+		if status.Code(err) != codes.NotFound {
+			return nil, fmt.Errorf("failed to get collection info: %w", err)
+		}
+
+		createCollection := &qdrant.CreateCollection{
+			CollectionName: config.QdrantConfig.CollectionName,
+			VectorsConfig: qdrant.NewVectorsConfig(&qdrant.VectorParams{
+				Size:     uint64(config.QdrantConfig.VectorSize),
+				Distance: qdrant.Distance_Cosine,
+			}),
+		}
+
+		if err := client.CreateCollection(ctx, createCollection); err != nil {
+			return nil, fmt.Errorf("failed to create collection: %w", err)
+		}
+	}
+
+	return &qdrantRepo{client: client, config: &config.QdrantConfig, logger: logger}, nil
 }
 
 func (repo *qdrantRepo) Insert(ctx context.Context, embeddings []*domain.VectorRepoInsertEmbedding) error {
@@ -51,7 +74,7 @@ func (repo *qdrantRepo) Insert(ctx context.Context, embeddings []*domain.VectorR
 	}
 
 	_, err := repo.client.Upsert(ctx, &qdrant.UpsertPoints{
-		CollectionName: repo.collectionName,
+		CollectionName: repo.config.CollectionName,
 		Points:         points,
 	})
 
@@ -133,7 +156,7 @@ func convertToQdrantMap(input map[string]any) (map[string]*qdrant.Value, error) 
 
 func (repo *qdrantRepo) Query(ctx context.Context, query *domain.VectorRepoQueryInput) ([]*domain.VectorRepoQueryResult, error) {
 	searchParams := &qdrant.QueryPoints{
-		CollectionName: repo.collectionName,
+		CollectionName: repo.config.CollectionName,
 		Query:          qdrant.NewQueryDense(query.Vector),
 		Limit:          qdrant.PtrOf(uint64(query.TopK)),
 		WithPayload:    qdrant.NewWithPayload(true),

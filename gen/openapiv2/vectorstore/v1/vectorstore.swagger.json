@@ -162,7 +162,7 @@
     "v1VectorStoreServiceSearchTextResponse": {
       "type": "object",
       "properties": {
-        "similarTexts": {
+        "similar_texts": {
           "type": "array",
           "items": {
             "type": "object",

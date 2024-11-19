@@ -16,7 +16,7 @@ type InsertTextsInputText struct {
 }
 
 type InsertTextsInput struct {
-	Texts []*InsertTextsInputText `validate:"required,min=1"`
+	Texts []*InsertTextsInputText `validate:"required,min=1,dive"`
 }
 
 func (input *InsertTextsInput) Validate(ctx context.Context) error {

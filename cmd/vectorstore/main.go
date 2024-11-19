@@ -43,7 +43,8 @@ func main() {
 	embedder, err := fastembed.NewEmbedder(
 		ctx,
 		http.DefaultClient,
-		config.FastembedConfig.BaseURL,
+		&config,
+		logger,
 	)
 	if err != nil {
 		logger.Error("failed to fastembed.NewEmbedder", slog.Any("error", err))
@@ -54,9 +55,8 @@ func main() {
 
 	vectorRepo, err := qdrant.NewVectorRepo(
 		ctx,
-		config.QdrantConfig.Host,
-		int(config.QdrantConfig.GRPCPort),
-		config.QdrantConfig.Collection,
+		&config,
+		logger,
 	)
 	if err != nil {
 		logger.Error("failed to qdrant.NewVectorRepo", slog.Any("error", err))

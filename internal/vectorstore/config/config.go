@@ -20,7 +20,8 @@ type FastembedConfig struct {
 }
 
 type QdrantConfig struct {
-	Host       string `env:"QDRANT_HOST,notEmpty"`
-	GRPCPort   uint16 `env:"QDRANT_GRPC_PORT,notEmpty"`
-	Collection string `env:"QDRANT_COLLECTION,notEmpty"`
+	Host           string `env:"QDRANT_HOST,notEmpty"`
+	GRPCPort       uint16 `env:"QDRANT_GRPC_PORT,notEmpty"`
+	CollectionName string `env:"QDRANT_COLLECTION_NAME,notEmpty"`
+	VectorSize     int    `env:"QDRANT_VECTOR_SIZE,notEmpty"`
 }
