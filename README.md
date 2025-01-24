@@ -1,11 +1,17 @@
 # RAG Server Deployment Guide
 
 ## Table of Contents
+- [Video Tutorial](#video-tutorial)
 - [How to Run the Server](#how-to-run-the-server)
   - [Install Models](#install-models)
   - [Run RAG Server via Docker](#run-rag-server-via-docker)
   - [Populate Vector Store](#populate-vectorstore)
   - [Test the RAG Server](#test-the-rag-server)
+
+## Video Tutorial
+[![RAG Implementation Tutorial](https://img.youtube.com/vi/VGYstLJRoUc/0.jpg)](https://www.youtube.com/watch?v=VGYstLJRoUc)
+
+Click the thumbnail above to watch a detailed implementation walkthrough.
 
 ## How to Run the Server
 
