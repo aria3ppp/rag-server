@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package vectorstore.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/aria3ppp/rag-server/gen/go/vectorstore/v1;vectorstorev1";
+
+message VectorStoreServiceInsertTextsRequestText {
+    string text = 1;
+    google.protobuf.Struct metadata = 2;
+}
+
+message VectorStoreServiceInsertTextsRequest {
+    repeated VectorStoreServiceInsertTextsRequestText texts = 1;
+}
+
+message VectorStoreServiceInsertTextsResponse {
+}
+
+message VectorStoreServiceSearchTextRequest {
+    string text = 1;
+    int64 top_k = 2 [json_name="top_k"];
+    float min_score = 3 [json_name="min_score"];
+    google.protobuf.Struct filter = 4;
+}
+
+message VectorStoreServiceSearchTextResponseSimilarText {
+    string text = 1;
+    float score = 2;
+    google.protobuf.Struct metadata = 3;
+}
+
+message VectorStoreServiceSearchTextResponse {
+    repeated VectorStoreServiceSearchTextResponseSimilarText similar_texts = 1 [json_name="similar_texts"];
+}
+
+service VectorStoreService {
+    rpc InsertTexts (VectorStoreServiceInsertTextsRequest) returns (VectorStoreServiceInsertTextsResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/insert_texts"
+            body: "*"
+        };
+    }
+
+    rpc SearchText (VectorStoreServiceSearchTextRequest) returns (VectorStoreServiceSearchTextResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/search_text"
+            body: "*"
+        };
+    }
+}

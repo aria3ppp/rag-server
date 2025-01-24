@@ -1,0 +1,157 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json
+
+services:
+
+  llm:
+    image: ghcr.io/ggerganov/llama.cpp:server # this is the server latest tag
+    command: ["-m", "/models/hugging-quants/Llama-3.2-1B-Instruct-Q4_K_M-GGUF/llama-3.2-1b-instruct-q4_k_m.gguf", "--pooling", "cls"]
+    environment:
+      LLAMA_ARG_PORT: 8081
+    expose:
+      - 8081
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./models/:/models/:ro
+
+  embedder:
+    image: ghcr.io/ggerganov/llama.cpp:server # this is the server latest tag
+    command: ["-m", "/models/CompendiumLabs/bge-small-en-v1.5-gguf/bge-small-en-v1.5-f32.gguf", "--embedding"]
+    environment:
+      LLAMA_ARG_PORT: 8082
+    expose:
+      - 8082
+    ports:
+      - "8082:8082"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./models/:/models/:ro
+
+  reranker:
+    image: ghcr.io/ggerganov/llama.cpp:server # this is the server latest tag
+    command: ["-m", "/models/BAAI/bge-reranker-base/bge-reranker-base-Q4_K_M.gguf", "--reranking"]
+    environment:
+      LLAMA_ARG_PORT: 8083
+    expose:
+      - 8083
+    ports:
+      - "8083:8083"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/health"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./models/:/models/:ro
+
+  qdrant:
+    image: qdrant/qdrant:v1.12.4
+    environment:
+      QDRANT__SERVICE__HTTP_PORT: ${QDRANT_HTTP_PORT:-6333}
+      QDRANT__SERVICE__GRPC_PORT: ${QDRANT_GRPC_PORT:-6334}
+    expose:
+      - ${QDRANT_HTTP_PORT:-6333}
+      - ${QDRANT_GRPC_PORT:-6334}
+    ports:
+      - "${QDRANT_HTTP_PORT:-6333}:${QDRANT_HTTP_PORT:-6333}" # dashboard is available at http://localhost:${QDRANT_HTTP_PORT:-6333}/dashboard
+      - "${QDRANT_GRPC_PORT:-6334}:${QDRANT_GRPC_PORT:-6334}"
+    volumes:
+      - qdrant:/qdrant/storage
+
+  qdrant-healthcheck:
+    image: busybox:1-musl
+    entrypoint: ["sleep", "infinity"] # Keeps the service running forever
+    depends_on:
+      - qdrant
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--quiet","--spider", "--tries=1", "http://qdrant:${QDRANT_HTTP_PORT:-6333}/healthz"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  rag:
+    # image: ghcr.io/aria3ppp/rag
+    # pull_policy: build
+    build:
+      dockerfile: ./docker/Dockerfile.rag
+      context: .
+    environment:
+      RAG_SERVER_GRPC_PORT: ${RAG_SERVER_GRPC_PORT:-9001}
+      RAG_SERVER_GATEWAY_PORT: ${RAG_SERVER_GATEWAY_PORT:-8000}
+      RAG_SERVER_GATEWAY_ALLOWED_ORIGINS: ${RAG_SERVER_GATEWAY_ALLOWED_ORIGINS:-*}
+      RAG_SERVER_GRACEFUL_SHUTDOWN_TIMEOUT: ${RAG_SERVER_GRACEFUL_SHUTDOWN_TIMEOUT:-30s}
+      OPENAI_BASEURL: ${OPENAI_BASEURL:-http://llm:8081/v1}
+      OPENAI_APIKEY: ${OPENAI_APIKEY:-apikey}
+      OPENAI_MODEL: ${OPENAI_MODEL:-model}
+      RERANKER_BASEURL: ${RERANKER_BASEURL:-http://reranker:8083/v1}
+      VECTORSTORE_HOST: ${VECTORSTORE_HOST:-vectorstore}
+      VECTORSTORE_SERVER_GRPC_PORT: ${VECTORSTORE_SERVER_GRPC_PORT:-9091}
+    expose:
+      - ${RAG_SERVER_GRPC_PORT:-9001}  # grpc
+      - ${RAG_SERVER_GATEWAY_PORT:-8000} # http gateway
+    ports:
+      - "${RAG_SERVER_GRPC_PORT:-9001}:${RAG_SERVER_GRPC_PORT:-9001}" # grpc
+      - "${RAG_SERVER_GATEWAY_PORT:-8000}:${RAG_SERVER_GATEWAY_PORT:-8000}" # http gateway
+    depends_on:
+      llm:
+        condition: service_healthy
+      reranker:
+        condition: service_healthy
+      vectorstore:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/app/rag", "-probe", "http", "-mute"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  vectorstore:
+    # image: ghcr.io/aria3ppp/vectorstore
+    # pull_policy: build
+    build:
+      dockerfile: ./docker/Dockerfile.vectorstore
+      context: .
+    environment:
+      VECTORSTORE_SERVER_GRPC_PORT: ${VECTORSTORE_SERVER_GRPC_PORT:-9091}
+      VECTORSTORE_SERVER_GATEWAY_PORT: ${VECTORSTORE_SERVER_GATEWAY_PORT:-8080}
+      VECTORSTORE_SERVER_GATEWAY_ALLOWED_ORIGINS: ${VECTORSTORE_SERVER_GATEWAY_ALLOWED_ORIGINS:-*}
+      VECTORSTORE_SERVER_GRACEFUL_SHUTDOWN_TIMEOUT: ${VECTORSTORE_SERVER_GRACEFUL_SHUTDOWN_TIMEOUT:-30s}
+      EMBEDDER_BASEURL: ${EMBEDDER_BASEURL:-http://embedder:8082/v1}
+      QDRANT_HOST: ${QDRANT_HOST:-qdrant}
+      QDRANT_GRPC_PORT: ${QDRANT_GRPC_PORT:-6334}
+      QDRANT_COLLECTION_NAME: ${QDRANT_COLLECTION_NAME:-collection}
+      QDRANT_VECTOR_SIZE: ${QDRANT_VECTOR_SIZE:-384}
+    expose:
+      - ${VECTORSTORE_SERVER_GRPC_PORT:-9091}  # grpc
+      - ${VECTORSTORE_SERVER_GATEWAY_PORT:-8080} # http gateway
+    ports:
+      - "${VECTORSTORE_SERVER_GRPC_PORT:-9091}:${VECTORSTORE_SERVER_GRPC_PORT:-9091}" # grpc
+      - "${VECTORSTORE_SERVER_GATEWAY_PORT:-8080}:${VECTORSTORE_SERVER_GATEWAY_PORT:-8080}" # http gateway
+    depends_on:
+      embedder:
+        condition: service_healthy
+      qdrant-healthcheck:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/app/vectorstore", "-probe", "http", "-mute"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      
+volumes:
+  qdrant: {}

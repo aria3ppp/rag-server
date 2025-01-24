@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package rag.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/aria3ppp/rag-server/gen/go/rag/v1;ragv1";
+
+enum Role {
+    ROLE_UNSPECIFIED = 0;
+    ROLE_SYSTEM = 1;
+    ROLE_ASSISTANT = 2;
+    ROLE_USER = 3;
+}
+
+enum StopReason {
+    STOP_REASON_UNSPECIFIED = 0;
+    STOP_REASON_DONE = 1;
+    STOP_REASON_ERROR = 2;
+}
+
+message Message {
+    Role role = 1;
+    string content = 2;
+}
+
+message RAGServiceQueryRequest {
+    string query = 1;
+    repeated Message messages = 2;
+}
+
+message RAGServiceQueryResponse {
+    string content = 1;
+    int64 created_in_ms = 2 [json_name="created_in_ms"];
+}
+
+message RAGServiceQueryStreamRequest {
+    string query = 1;
+    repeated Message messages = 2;
+}
+
+message RAGServiceQueryStreamResponse {
+    string content = 1;
+    int64  created_at_ms = 2 [json_name="created_at_ms"];
+    StopReason stop_reason = 3 [json_name="stop_reason"];
+    string error = 4;
+}
+
+service RAGService {
+    rpc Query (RAGServiceQueryRequest) returns (RAGServiceQueryResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/query"
+            body: "*"
+        };
+    }
+
+    rpc QueryStream (RAGServiceQueryStreamRequest) returns (stream RAGServiceQueryStreamResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/query_stream"
+            body: "*"
+        };
+    }
+}

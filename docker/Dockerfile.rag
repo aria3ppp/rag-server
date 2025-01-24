@@ -1,0 +1,20 @@
+# syntax=docker/dockerfile:1
+
+# build stage
+FROM golang:1.23-alpine3.20 AS builder
+
+WORKDIR /src/
+
+# download dependencies
+COPY go.mod go.sum ./
+RUN go mod download
+
+# copy and build source
+COPY . .
+RUN go build -tags release -o /app/ ./cmd/rag
+
+# run stage
+FROM scratch
+
+COPY --from=builder /app/rag /app/
+ENTRYPOINT ["/app/rag"]

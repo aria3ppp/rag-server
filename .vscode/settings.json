@@ -1,0 +1,43 @@
+{
+    // "go.coverOnSave": true,
+    "go.testFlags": [
+        // "-v",
+        "-count=1",
+        "-timeout=5m",
+        "-parallel=1",
+    ],
+    "testing.coverageToolbarEnabled": true,
+    "go.coverageDecorator": {
+        "coveredGutterStyle": "slashgreen",
+        "type": "gutter",
+        "uncoveredGutterStyle": "slashred",
+    },
+    "cSpell.words": [
+        "baai",
+        "caarlos",
+        "embedder",
+        "FASTAPI",
+        "Fastembed",
+        "goccy",
+        "healthcheck",
+        "healthz",
+        "infras",
+        "intfloat",
+        "langchaingo",
+        "llms",
+        "ollama",
+        "openapiv",
+        "otelslog",
+        "protojson",
+        "qdrant",
+        "ragv",
+        "Rerank",
+        "Reranker",
+        "samber",
+        "structpb",
+        "testcontainers",
+        "usecase",
+        "VECTORSTORE",
+        "vectorstorev"
+    ]
+}

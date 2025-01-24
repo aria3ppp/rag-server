@@ -1,0 +1,194 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "vectorstore/v1/vectorstore.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "VectorStoreService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/insert_texts": {
+      "post": {
+        "operationId": "VectorStoreService_InsertTexts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1VectorStoreServiceInsertTextsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1VectorStoreServiceInsertTextsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "VectorStoreService"
+        ]
+      }
+    },
+    "/api/v1/search_text": {
+      "post": {
+        "operationId": "VectorStoreService_SearchText",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1VectorStoreServiceSearchTextResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1VectorStoreServiceSearchTextRequest"
+            }
+          }
+        ],
+        "tags": [
+          "VectorStoreService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1VectorStoreServiceInsertTextsRequest": {
+      "type": "object",
+      "properties": {
+        "texts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1VectorStoreServiceInsertTextsRequestText"
+          }
+        }
+      }
+    },
+    "v1VectorStoreServiceInsertTextsRequestText": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "v1VectorStoreServiceInsertTextsResponse": {
+      "type": "object"
+    },
+    "v1VectorStoreServiceSearchTextRequest": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "top_k": {
+          "type": "string",
+          "format": "int64"
+        },
+        "min_score": {
+          "type": "number",
+          "format": "float"
+        },
+        "filter": {
+          "type": "object"
+        }
+      }
+    },
+    "v1VectorStoreServiceSearchTextResponse": {
+      "type": "object",
+      "properties": {
+        "similar_texts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1VectorStoreServiceSearchTextResponseSimilarText"
+          }
+        }
+      }
+    },
+    "v1VectorStoreServiceSearchTextResponseSimilarText": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "score": {
+          "type": "number",
+          "format": "float"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

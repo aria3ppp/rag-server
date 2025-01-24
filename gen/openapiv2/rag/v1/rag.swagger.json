@@ -1,0 +1,213 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "rag/v1/rag.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "RAGService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/query": {
+      "post": {
+        "operationId": "RAGService_Query",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RAGServiceQueryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RAGServiceQueryRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RAGService"
+        ]
+      }
+    },
+    "/api/v1/query_stream": {
+      "post": {
+        "operationId": "RAGService_QueryStream",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/v1RAGServiceQueryStreamResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/rpcStatus"
+                }
+              },
+              "title": "Stream result of v1RAGServiceQueryStreamResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RAGServiceQueryStreamRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RAGService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Message": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/v1Role"
+        },
+        "content": {
+          "type": "string"
+        }
+      }
+    },
+    "v1RAGServiceQueryRequest": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Message"
+          }
+        }
+      }
+    },
+    "v1RAGServiceQueryResponse": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "created_in_ms": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1RAGServiceQueryStreamRequest": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Message"
+          }
+        }
+      }
+    },
+    "v1RAGServiceQueryStreamResponse": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "created_at_ms": {
+          "type": "string",
+          "format": "int64"
+        },
+        "stop_reason": {
+          "$ref": "#/definitions/v1StopReason"
+        },
+        "error": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Role": {
+      "type": "string",
+      "enum": [
+        "ROLE_UNSPECIFIED",
+        "ROLE_SYSTEM",
+        "ROLE_ASSISTANT",
+        "ROLE_USER"
+      ],
+      "default": "ROLE_UNSPECIFIED"
+    },
+    "v1StopReason": {
+      "type": "string",
+      "enum": [
+        "STOP_REASON_UNSPECIFIED",
+        "STOP_REASON_DONE",
+        "STOP_REASON_ERROR"
+      ],
+      "default": "STOP_REASON_UNSPECIFIED"
+    }
+  }
+}
