@@ -1,17 +1,18 @@
 # RAG Server Deployment Guide
 
 ## Table of Contents
-- [Video Tutorial](#video-tutorial)
+- [Video Tutorial (Persian)](#video-tutorial-persian)
 - [How to Run the Server](#how-to-run-the-server)
   - [Install Models](#install-models)
   - [Run RAG Server via Docker](#run-rag-server-via-docker)
   - [Populate Vector Store](#populate-vectorstore)
   - [Test the RAG Server](#test-the-rag-server)
 
-## Video Tutorial
-[![RAG Implementation Tutorial](https://img.youtube.com/vi/VGYstLJRoUc/0.jpg)](https://www.youtube.com/watch?v=VGYstLJRoUc)
+## Video Tutorial (Persian)
+[![RAG Implementation Tutorial in Persian](https://img.youtube.com/vi/VGYstLJRoUc/0.jpg)](https://www.youtube.com/watch?v=VGYstLJRoUc)  
+*(Video explanation in Persian/Farsi - English tutorial coming soon)*
 
-Click the thumbnail above to watch a detailed implementation walkthrough.
+**Persian Language Tutorial** - Click the thumbnail above to watch a detailed implementation walkthrough in Persian.
 
 ## How to Run the Server
 
